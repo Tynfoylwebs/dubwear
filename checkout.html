@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DubTerrain - Checkout</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Checkout Section */
+        .checkout {
+            padding: 80px 20px;
+            background: #f5f5f7;
+        }
+
+        .checkout h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #1d1d1f;
+        }
+
+        .checkout p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        .checkout .total {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 20px;
+        }
+
+        .snap-input {
+            margin-top: 20px;
+        }
+
+        .snap-input input {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .snap-input button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            background: #0071e3;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .snap-input button:hover {
+            background: #005bb5;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0071e3;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- Checkout Section -->
+    <section class="checkout">
+        <h2>Checkout</h2>
+        <div id="cart-items"></div>
+        <p class="total">Total: <span id="cart-total">0€</span></p>
+
+        <!-- Snap Input -->
+        <div class="snap-input">
+            <input type="text" id="snap-username" placeholder="Enter your Snap username">
+            <button onclick="completeCheckout()">Complete Checkout</button>
+        </div>
+
+        <a href="products.html" class="back-link">← Back to Products</a>
+    </section>
+
+    <script>
+        // Retrieve cart from localStorage
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // Display cart
+        const cartItems = document.getElementById("cart-items");
+        const cartTotal = document.getElementById("cart-total");
+
+        if (cart.length > 0) {
+            cartItems.innerHTML = cart.map(item => `<p>${item.product} - ${item.price}€</p>`).join('');
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            cartTotal.innerText = `${total}€`;
+        } else {
+            cartItems.innerHTML = "<p>Your cart is empty.</p>";
+        }
+
+        // Complete Checkout Function
+        async function completeCheckout() {
+            const snapUsername = document.getElementById("snap-username").value.trim();
+
+            if (!snapUsername) {
+                alert("Please enter your Snap username.");
+                return;
+            }
+
+            // Prepare cart details
+            const cartDetails = cart.map(item => `${item.product} - ${item.price}€`).join("\n");
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+            // Send data to Discord webhook
+            const webhookURL = "https://discord.com/api/webhooks/1340292367961296916/68BfrVxbjp8OGE9Tl8PKx9UAsx93QrJR9iEhJgU_8Cx5rnOqr9GrdKrHDmHZL5xtG40C";
+            const message = {
+                content: "New Order Received!",
+                embeds: [
+                    {
+                        title: "Cart Information",
+                        description: `**Snap Username:** ${snapUsername}\n\n**Cart Items:**\n${cartDetails}\n\n**Total:** ${total}€`,
+                        color: 0x0071e3,
+                    },
+                ],
+            };
+
+            try {
+                await fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(message),
+                });
+
+                alert("Thank you for your purchase! Your order has been sent.");
+                localStorage.removeItem("cart"); // Clear cart
+                window.location.href = "products.html"; // Redirect to products page
+            } catch (error) {
+                alert("An error occurred while processing your order. Please try again.");
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

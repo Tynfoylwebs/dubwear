@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DubTerrain - Online Store</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 50px; /* Increased gap for more spacing */
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            font-weight: 400;
+            color: #1d1d1f;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        /* Password Prompt */
+        .password-prompt {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .password-prompt input {
+            padding: 10px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .password-prompt button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            background: #0071e3;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .password-prompt button:hover {
+            background: #005bb5;
+        }
+
+        /* Shopping Cart */
+        .cart {
+            position: fixed;
+            top: 20px;
+            right: 50px;
+            background: #0071e3;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .cart:hover {
+            background: #005bb5;
+        }
+
+        .cart-items {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: left;
+        }
+
+        .cart-items p {
+            margin: 10px 0;
+            font-size: 14px;
+            color: #1d1d1f;
+        }
+
+        .checkout-button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            background: #0071e3;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; /* Increased spacing */
+            width: 100%;
+        }
+
+        .checkout-button:hover {
+            background: #005bb5;
+        }
+
+        /* Products Page */
+        .products-page {
+            display: none;
+            padding: 80px 20px;
+            background: #f5f5f7;
+        }
+
+        .products-page h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #1d1d1f;
+        }
+
+        .sort-by-brand {
+            margin-bottom: 20px;
+        }
+
+        .sort-by-brand select {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .product {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .product p {
+            font-size: 1rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #6e6e73;
+        }
+
+        .product .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0071e3;
+        }
+
+        .product .discount {
+            font-size: 1rem;
+            color: #ff3b30;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+
+        .product button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            background: #0071e3;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .product button:hover {
+            background: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Prompt -->
+    <div class="password-prompt">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button onclick="unlockProducts()">Unlock</button>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="header">
+        <div class="logo">DubTerrain</div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#countdown">Countdown</a>
+            <a href="products.html">Products</a>
+        </nav>
+        <div class="cart" onclick="toggleCart()">🛒 Cart (<span id="cart-count">0</span>)</div>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items will be dynamically added here -->
+            <button class="checkout-button" onclick="checkout()">Checkout</button>
+        </div>
+    </header>
+    
+    <!-- Products Page -->
+    <section class="products-page">
+        <h2>Our Products</h2>
+        <div class="sort-by-brand">
+            <label for="brand-sort">Sort by Brand:</label>
+            <select id="brand-sort" onchange="sortProductsByBrand()">
+                <option value="all">All Brands</option>
+                <option value="nike">Nike</option>
+                <option value="north face">North Face</option>
+                <option value="montirex">Montirex</option>
+                <option value="monterain">Monterain</option>
+                <option value="apple">Apple</option>
+            </select>
+        </div>
+        <div class="product-grid" id="product-grid">
+            <!-- Products will be dynamically added here -->
+        </div>
+    </section>
+
+    <script>
+        // Password Protection
+        function unlockProducts() {
+            const password = document.getElementById("password").value;
+            if (password === "00") {
+                document.querySelector(".password-prompt").style.display = "none";
+                document.querySelector(".products-page").style.display = "block";
+                loadProducts();
+            } else {
+                alert("Incorrect Password");
+            }
+        }
+
+        // Shopping Cart
+        let cart = [];
+
+        function addToCart(product, price) {
+            cart.push({ product, price });
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById("cart-items");
+            const cartCount = document.getElementById("cart-count");
+            cartItems.innerHTML = cart.map(item => `<p>${item.product} - ${item.price}€</p>`).join('');
+            cartItems.innerHTML += `<button class="checkout-button" onclick="checkout()">Checkout</button>`;
+            cartCount.innerText = cart.length;
+        }
+
+        function toggleCart() {
+            const cartItems = document.getElementById("cart-items");
+            cartItems.style.display = cartItems.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Get User IP Address
+        async function getUserIP() {
+            try {
+                const response = await fetch("https://api.ipify.org?format=json");
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error("Error fetching IP address:", error);
+                return null;
+            }
+        }
+
+        // Checkout Function
+        async function checkout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            // Get user IP address
+            const userIP = await getUserIP();
+
+            // Prepare order data
+            const orderData = {
+                cart,
+                userIP,
+                timestamp: new Date().toISOString(),
+            };
+
+            // Log order data (for debugging)
+            console.log("Order Data:", orderData);
+
+            // Send order data to Discord webhook
+            try {
+                const webhookURL = "https://discord.com/api/webhooks/1340292367961296916/68BfrVxbjp8OGE9Tl8PKx9UAsx93QrJR9iEhJgU_8Cx5rnOqr9GrdKrHDmHZL5xtG40C";
+                const response = await fetch(webhookURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        content: `New Order Received!\n\n**Order Details:**\n${JSON.stringify(orderData, null, 2)}`,
+                    }),
+                });
+
+                if (response.ok) {
+                    alert("Order placed successfully! Check Discord for details.");
+                    cart = []; // Clear the cart
+                    updateCartDisplay();
+                } else {
+                    alert("Failed to place order. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error during checkout:", error);
+                alert("An error occurred. Please try again.");
+            }
+        }
+
+        // Product Data with Images and Discount
+        const products = [
+            { brand: "montirex", name: "Montirex Agility Tracksuit - Black/Asphalt", price: 60, originalPrice: 120, image: "https://montirex.com/cdn/shop/files/AGILITY-TRACKSUIT---BLACK-ASPHALT-full-front.jpg?v=1724747898", description: "Lightweight and breathable tracksuit for ultimate comfort and performance." },
+            { brand: "monterain", name: "Monterain Orbit Woven Running Hoodie", price: 45, originalPrice: 90, image: "https://www.lifestylesports.com/on/demandware.static/-/Sites-LSS_eCommerce_Master/default/dwd84ecc1c/images/50829810xlarge.jpg", description: "Stylish and functional hoodie designed for running and outdoor activities." },
+            { brand: "nike", name: "Nike Air Max tn plus", price: 75, originalPrice: 150, image: "https://static.nike.com/a/images/t_PDP_936_v1/f_auto,q_auto:eco/b9739f66-98f6-42a7-8fe6-6b25ef0b9d83/NIKE+AIR+MAX+PLUS.png", description: "Iconic Nike Air Max 270 with superior cushioning." },
+            { brand: "north face", name: "North Face Jacket", price: 100, originalPrice: 200, image: "https://assets.thenorthface.eu/images/t_img/f_auto,h_344,w_344/e_sharpen:60/dpr_2.0/v1724941927/NF0A7UREJK3-HERO/Mens-2000-Synthetic-Puffer-Jacket.jpg", description: "Durable and warm jacket for extreme weather conditions." },
+            { brand: "apple", name: "Apple Watch Series 8", price: 199.5, originalPrice: 399, image: "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MXM23ref_FV99_VW_34FR+watch-case-46-aluminum-jetblack-nc-s10_VW_34FR+watch-face-46-aluminum-jetblack-s10_VW_34FR?wid=752&hei=720&bgc=fafafa&trim=1&fmt=p-jpg&qlt=80&.v=TnVrdDZWRlZzTURKbHFqOGh0dGpVRW5TeWJ6QW43NUFnQ2V4cmRFc1VnYUdWejZ5THhpKzJwRmRDYlhxN2o5aXB2QjR6TEZ4ZThxM3VqYkZobmlXM3RGNnlaeXQ4NGFKQTAzc0NGeHR2aVk0VEhOZEFKYmY1ZHNpalQ3YVhOWk9WVlBjZVFuazArV21YaFcvTVJ5dzR2eDMxaWg4TFhITTVrUW41Z084dENpYmZuSTdFUnErS0g3SWYxazQrNDdyRzE3K0tORmZaUy9vOVdqTEp2dmJNL3gwYlE3R0w4Z1RCbG9qQTd1MjYyL1owaE5aVCt2Ri82aDRacTg0bXlaZA", description: "The latest Apple Watch with advanced health features." }
+        ];
+
+        // Load Products
+        function loadProducts() {
+            const productGrid = document.getElementById("product-grid");
+            productGrid.innerHTML = products.map(product => `
+                <div class="product" data-brand="${product.brand}">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="price">
+                        <span class="discount">${product.originalPrice}€</span>
+                        ${product.price}€
+                    </p>
+                    <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        // Sort Products by Brand
+        function sortProductsByBrand() {
+            const selectedBrand = document.getElementById("brand-sort").value;
+            const productElements = document.querySelectorAll(".product");
+
+            productElements.forEach(product => {
+                const brand = product.getAttribute("data-brand");
+                if (selectedBrand === "all" || brand === selectedBrand) {
+                    product.style.display = "flex";
+                } else {
+                    product.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
